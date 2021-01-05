@@ -22,8 +22,8 @@ require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 
 class espeasy extends eqLogic {
 
-  public static function sendCommand( $ip, $value ) {
-    $url = 'http://' . $ip . '/control?cmd=' . $value;
+  public static function sendCommand( $ip, $cmd ) {
+    $url = 'http://' . $ip . '/control?cmd=' . $cmd;
     $retour = file_get_contents($url);
   }
 
@@ -122,7 +122,7 @@ class espeasy extends eqLogic {
   }
 
   public function preSave() {
-    $this->setLogicalId($this->getConfiguration('ip'));
+    // $this->setLogicalId($this->getConfiguration('ip'));
   }
 }
 
