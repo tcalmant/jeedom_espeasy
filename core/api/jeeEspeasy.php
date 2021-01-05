@@ -37,10 +37,8 @@ $logicalId = $unitName . "-" . $unitId;
 $elogic = espeasy::byLogicalId($logicalId, 'espeasy');
 if (!is_object($elogic)) {
 	if (config::byKey('include_mode','espeasy') != 1) {
-		log::add('espeasy', 'info', 'Ignore unknown logicalId: ' . $logicalId);
 		return false;
 	}
-
 
 	$elogic = new espeasy();
 	$elogic->setEqType_name('espeasy');
@@ -53,22 +51,15 @@ if (!is_object($elogic)) {
 	$elogic->setConfiguration('device', $unitName);
 	$elogic->save();
 
-	log::add('espeasy', 'info', 'include OK');
-
 	event::add('espeasy::includeDevice',
 		array(
 			'state' => 1
 		)
 	);
-} else {
-	log::add('espeasy', 'info', 'Found existing: ' . $elogic->getId() . " - " . $elogic->getLogicalId() . " - " . $elogic->getName());
 }
-
-log::add('espeasy', 'info', 'Used input: ' . $elogic->getId() . " - " . $elogic->getLogicalId());
 
 $cmdlogic = espeasyCmd::byEqLogicIdAndLogicalId($elogic->getId(), $cmd);
 if (!is_object($cmdlogic)) {
-	log::add('espeasy', 'info', 'New command: ' . $elogic->getId() . " - " . $cmd);
 	$cmdlogic = new espeasyCmd();
 	$cmdlogic->setLogicalId($cmd);
 	$cmdlogic->setName($cmd);
