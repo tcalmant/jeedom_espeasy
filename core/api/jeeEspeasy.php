@@ -18,43 +18,57 @@
 require_once dirname(__FILE__) . "/../../../../core/php/core.inc.php";
 
 if (!jeedom::apiAccess(init('apikey'), 'espeasy')) {
- echo __('Clef API non valide, vous n\'êtes pas autorisé à effectuer cette action (espeasy)', __FILE__);
- die();
-}	
-
-$device = init('device');
-$ip = init('ip');
-$taskid = init('taskid');
-$cmd = init('cmd');
-$value = init('value');
-
-$elogic = espeasy::byLogicalId($ip, 'espeasy');
-if (!is_object($elogic)) {
-	if (config::byKey('include_mode','espeasy') != 1) {
-		return false;
-	}
-	$elogic = new espeasy();
-	$elogic->setEqType_name('espeasy');
-	$elogic->setLogicalId($ip);
-	$elogic->setName($device);
-	$elogic->setIsEnable(true);
-	$elogic->setConfiguration('ip',$ip);
-	$elogic->setConfiguration('device',$device);
-	$elogic->save();
-	event::add('espeasy::includeDevice',
-	array(
-		'state' => 1
-	)
-);
-} else {
-	if ($device != $elogic->getConfiguration('device')) {
-		$elogic->setConfiguration('device',$device);
-		$elogic->save();
-	}
+	http_response_code(403);
+	echo __('Clef API non valide, vous n\'êtes pas autorisé à effectuer cette action (espeasy)', __FILE__);
+ 	die();
 }
 
-$cmdlogic = espeasyCmd::byEqLogicIdAndLogicalId($elogic->getId(),$cmd);
+
+$sourceIp = init('ip');
+$unitName = init('name');
+$unitId = init('unitId', "0");
+$taskid = init('taskid');
+$cmd = init('valuename');
+$value = init('value');
+
+// Compute a logical ID
+$logicalId = $unitName . "-" . $unitId;
+
+$elogic = espeasy::byLogicalId($logicalId, 'espeasy');
+if (!is_object($elogic)) {
+	if (config::byKey('include_mode','espeasy') != 1) {
+		log::add('espeasy', 'info', 'Ignore unknown logicalId: ' . $logicalId);
+		return false;
+	}
+
+
+	$elogic = new espeasy();
+	$elogic->setEqType_name('espeasy');
+	$elogic->setLogicalId($logicalId);
+	$elogic->setObject_id($unitId);
+	$elogic->setName($unitName);
+	$elogic->setIsEnable(true);
+	$elogic->setConfiguration('logicalId', $logicalId);
+	$elogic->setConfiguration('ip', $sourceIp);
+	$elogic->setConfiguration('device', $unitName);
+	$elogic->save();
+
+	log::add('espeasy', 'info', 'include OK');
+
+	event::add('espeasy::includeDevice',
+		array(
+			'state' => 1
+		)
+	);
+} else {
+	log::add('espeasy', 'info', 'Found existing: ' . $elogic->getId() . " - " . $elogic->getLogicalId() . " - " . $elogic->getName());
+}
+
+log::add('espeasy', 'info', 'Used input: ' . $elogic->getId() . " - " . $elogic->getLogicalId());
+
+$cmdlogic = espeasyCmd::byEqLogicIdAndLogicalId($elogic->getId(), $cmd);
 if (!is_object($cmdlogic)) {
+	log::add('espeasy', 'info', 'New command: ' . $elogic->getId() . " - " . $cmd);
 	$cmdlogic = new espeasyCmd();
 	$cmdlogic->setLogicalId($cmd);
 	$cmdlogic->setName($cmd);
