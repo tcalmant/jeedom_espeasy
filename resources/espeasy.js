@@ -75,6 +75,7 @@ function answer(req, res) {
   if(req.method != "GET") {
     // HTTP response header - the content will be HTML MIME type
     sendResponse(res, "Unhandled HTTP method. Use GET.", 405);
+    console.log("Unhandled HTTP method: " + req.method);
     return false;
   }
 
@@ -84,6 +85,7 @@ function answer(req, res) {
   if(parsedUrl.search == "") {
     // No parameter given: nothing we can do with it
     sendResponse(res, "Nothing to do without a query string", 200);
+    console.log("Nothing to do without a query string: " + parsedUrl + " // " + parsedUrl.search);
     return false;
   }
 
@@ -93,7 +95,7 @@ function answer(req, res) {
     parsedUrl.searchParams.set("ip", req.socket.remoteAddress);
   }
 
-  if (loglevel <= 200) {
+  if (loglevel <= 100) {
     // INFO
     console.log("Got query from " + parsedUrl.searchParams.get("ip") + ":" + parsedUrl.search);
   }
@@ -141,6 +143,8 @@ function answer(req, res) {
 
 // Create the HTTP server
 var server = http.createServer(answer);
+
+console.log("Starting server: " + serverIP + " - " + serverPort);
 
 // Turn server on - now listening for requests on localIP and port
 server.listen(serverPort, serverIP);
