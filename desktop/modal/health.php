@@ -35,7 +35,7 @@ $eqLogics = espeasy::byType('espeasy');
 		</tr>
 	</thead>
 	<tbody>
-	 <?php
+<?php
 foreach ($eqLogics as $eqLogic) {
 	echo '<tr><td><a href="' . $eqLogic->getLinkToConfiguration() . '" style="text-decoration: none;">' . $eqLogic->getHumanName(true) . '</a></td>';
 	echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getId() . '</span></td>';
@@ -50,7 +50,7 @@ foreach ($eqLogics as $eqLogic) {
 	$battery = $eqLogic->getConfiguration('batteryStatus');
 	if ($battery == '') {
 		$battery_status = '<span class="label label-primary" style="font-size : 1em;" title="{{Secteur}}"><i class="fas fa-plug"></i></span>';
-  } elseif ($battery < 20) {
+	} elseif ($battery < 20) {
 		$battery_status = '<span class="label label-danger" style="font-size : 1em;">' . $battery . '%</span>';
 	} elseif ($battery < 60) {
 		$battery_status = '<span class="label label-warning" style="font-size : 1em;">' . $battery . '%</span>';

@@ -22,16 +22,25 @@ require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 
 class espeasy extends eqLogic {
 
+  /**
+   * Sends a command to an ESP Easy
+   *
+   * @param string $ip Address of the ESP Easy
+   * @param any $value Command value
+   */
   public static function sendCommand( $ip, $value ) {
     $url = 'http://' . $ip . '/control?cmd=' . $value;
     $retour = file_get_contents($url);
   }
 
+  /**
+   * Checks the status of the daemon
+   */
   public static function deamon_info() {
     $return = array();
-    $return['log'] = 'espeasy_node';
+    $return['log'] = 'espeasy-tcalmant_daemon';
     $return['state'] = 'nok';
-    $pid = trim( shell_exec ('ps ax | grep "espeasy/resources/espeasy.js" | grep -v "grep" | wc -l') );
+    $pid = trim( shell_exec ('ps ax | grep "espeasy_daemon.py" | grep -v "grep" | wc -l') );
     if ($pid != '' && $pid != '0') {
       $return['state'] = 'ok';
     }
@@ -39,26 +48,29 @@ class espeasy extends eqLogic {
     return $return;
   }
 
+  /**
+   * Starts the daemon
+   */
   public static function deamon_start() {
     self::deamon_stop();
     $deamon_info = self::deamon_info();
     if ($deamon_info['launchable'] != 'ok') {
       throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
     }
-    log::add('espeasy', 'info', 'Lancement du démon espeasy');
+    log::add('espeasy-tcalmant', 'info', 'Lancement du démon espeasy-tcalmant');
 
-    $url = network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/espeasy/core/api/jeeEspeasy.php?apikey=' . jeedom::getApiKey('espeasy');
+    $url = network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/espeasy-tcalmant/core/api/jeeEspeasy.php?apikey=' . jeedom::getApiKey('espeasy-tcalmant');
 
-    $log = log::getLogLevel('espeasy');
+    $log = log::getLogLevel('espeasy-tcalmant');
     $sensor_path = realpath(dirname(__FILE__) . '/../../resources');
 
-    $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/espeasy.js ' . config::byKey('internalAddr') . ' ' . $url . ' ' . $log;
+    $cmd = 'nice -n 19 python3 ' . $sensor_path . '/espeasy_daemon.py --jeedom ' . $url . ' --log ' . $log;
 
-    log::add('espeasy', 'debug', 'Lancement démon espeasy : ' . $cmd);
+    log::add('espeasy-tcalmant', 'debug', 'Lancement démon espeasy-tcalmant : ' . $cmd);
 
-    $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('espeasy_node') . ' 2>&1 &');
+    $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('espeasy-tcalmant_daemon') . ' 2>&1 &');
     if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false) {
-      log::add('espeasy', 'error', $result);
+      log::add('espeasy-tcalmant', 'error', $result);
       return false;
     }
 
@@ -72,26 +84,29 @@ class espeasy extends eqLogic {
       $i++;
     }
     if ($i >= 30) {
-      log::add('espeasy', 'error', 'Impossible de lancer le démon espeasy, vérifiez le port', 'unableStartDeamon');
+      log::add('espeasy-tcalmant', 'error', 'Impossible de lancer le démon espeasy-tcalmant, vérifiez le port', 'unableStartDeamon');
       return false;
     }
-    message::removeAll('espeasy', 'unableStartDeamon');
-    log::add('espeasy', 'info', 'Démon espeasy lancé');
+    message::removeAll('espeasy-tcalmant', 'unableStartDeamon');
+    log::add('espeasy-tcalmant', 'info', 'Démon espeasy-tcalmant lancé');
     return true;
   }
 
+  /**
+   * Stopping daemon
+   */
   public static function deamon_stop() {
-    exec('kill $(ps aux | grep "/espeasy.js" | awk \'{print $2}\')');
-    log::add('espeasy', 'info', 'Arrêt du service espeasy');
+    exec('kill $(ps aux | grep "/espeasy_daemon.py" | awk \'{print $2}\')');
+    log::add('espeasy-tcalmant', 'info', 'Arrêt du service espeasy-tcalmant');
     $deamon_info = self::deamon_info();
     if ($deamon_info['state'] == 'ok') {
       sleep(1);
-      exec('kill -9 $(ps aux | grep "/espeasy.js" | awk \'{print $2}\')');
+      exec('kill -9 $(ps aux | grep "/espeasy_daemon.py" | awk \'{print $2}\')');
     }
     $deamon_info = self::deamon_info();
     if ($deamon_info['state'] == 'ok') {
       sleep(1);
-      exec('sudo kill -9 $(ps aux | grep "/espeasy.js" | awk \'{print $2}\')');
+      exec('sudo kill -9 $(ps aux | grep "/espeasy_daemon.py" | awk \'{print $2}\')');
     }
   }
 
@@ -150,7 +165,7 @@ class espeasyCmd extends cmd {
   public function preSave() {
     if ($this->getType() == "action") {
       $eqLogic = $this->getEqLogic();
-      log::add('espeasy','info','http://' . $eqLogic->getConfiguration('ip') . '/control?cmd=' . $this->getConfiguration('request'));
+      log::add('espeasy-tcalmant','info','http://' . $eqLogic->getConfiguration('ip') . '/control?cmd=' . $this->getConfiguration('request'));
       $this->setConfiguration('value', 'http://' . $eqLogic->getConfiguration('ip') . '/control?cmd=' . $this->getConfiguration('request'));
       //$this->save();
     }

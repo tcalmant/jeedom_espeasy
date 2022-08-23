@@ -17,29 +17,41 @@
  */
 require_once dirname(__FILE__) . "/../../../../core/php/core.inc.php";
 
-if (!jeedom::apiAccess(init('apikey'), 'espeasy')) {
- echo __('Clef API non valide, vous n\'êtes pas autorisé à effectuer cette action (espeasy)', __FILE__);
- die();
-}	
+if (!jeedom::apiAccess(init('apikey'), 'espeasy-tcalmant')) {
+	echo __('Clef API non valide, vous n\'êtes pas autorisé à effectuer cette action (espeasy)', __FILE__);
+	die();
+}
 
-$device = init('device');
-$ip = init('ip');
-$taskid = init('taskid');
-$cmd = init('cmd');
+$espUnitId = init('unitId');
+$espUnitName = init('name');
+$espClientIp = init('ip');
+$espUnitIp = init('unitIp');
+$taskid = init('task');
+$valueName = init('valueName');
 $value = init('value');
 
-$elogic = espeasy::byLogicalId($ip, 'espeasy');
+// Generate a logical ID based on the Unit name and its ID
+$logicalId = $espUnitName . "-" . $espUnitId;
+
+// Make sure we have a valid IP address
+if(empty($espUnitIp)) {
+	$ip = $espClientIp;
+} else {
+	$ip = $espUnitIp;
+}
+
+$elogic = espeasy::byLogicalId($logicalId, 'espeasy-tcalmant');
 if (!is_object($elogic)) {
-	if (config::byKey('include_mode','espeasy') != 1) {
+	if (config::byKey('include_mode','espeasy-tcalmant') != 1) {
 		return false;
 	}
 	$elogic = new espeasy();
-	$elogic->setEqType_name('espeasy');
-	$elogic->setLogicalId($ip);
-	$elogic->setName($device);
+	$elogic->setEqType_name('espeasy-tcalmant');
+	$elogic->setLogicalId($logicalId);
+	$elogic->setName($espUnitName);
 	$elogic->setIsEnable(true);
-	$elogic->setConfiguration('ip',$ip);
-	$elogic->setConfiguration('device',$device);
+	$elogic->setConfiguration('ip', $ip);
+	$elogic->setConfiguration('device', $logicalId);
 	$elogic->save();
 	event::add('espeasy::includeDevice',
 	array(
@@ -48,21 +60,21 @@ if (!is_object($elogic)) {
 );
 } else {
 	if ($device != $elogic->getConfiguration('device')) {
-		$elogic->setConfiguration('device',$device);
+		$elogic->setConfiguration('device', $logicalId);
 		$elogic->save();
 	}
 }
 
-$cmdlogic = espeasyCmd::byEqLogicIdAndLogicalId($elogic->getId(),$cmd);
+$cmdlogic = espeasyCmd::byEqLogicIdAndLogicalId($elogic->getId(), $valueName);
 if (!is_object($cmdlogic)) {
 	$cmdlogic = new espeasyCmd();
-	$cmdlogic->setLogicalId($cmd);
-	$cmdlogic->setName($cmd);
+	$cmdlogic->setLogicalId($valueName);
+	$cmdlogic->setName($valueName);
 	$cmdlogic->setType('info');
 	$cmdlogic->setSubType('numeric');
 	$cmdlogic->setEqLogic_id($elogic->getId());
 	$cmdlogic->setConfiguration('taskid',$taskid);
-	$cmdlogic->setConfiguration('cmd',$cmd);
+	$cmdlogic->setConfiguration('cmd',$valueName);
 }
 $cmdlogic->setConfiguration('value',$value);
 $cmdlogic->event($value);
