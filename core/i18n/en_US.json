@@ -1,10 +1,10 @@
 {
-    "plugins\/espeasy\/plugin_info\/configuration.php": {
+    "plugins\/espeasy_tcalmant\/plugin_info\/configuration.php": {
         "IP Controleur à saisir dans ESPeasy (onglet config)": "IP Controleur à saisir dans ESPeasy (onglet config)",
         "Port Controleur à saisir dans ESPeasy (onglet config)": "Port Controleur à saisir dans ESPeasy (onglet config)",
         "Publish template à saisir dans ESPeasy (onglet tools, puis bouton advanced)": "Publish template à saisir dans ESPeasy (onglet tools, puis bouton advanced)"
     },
-    "plugins\/espeasy\/desktop\/php\/espeasy.php": {
+    "plugins\/espeasy_tcalmant\/desktop\/php\/espeasy.php": {
         "Inclure périphérique ESP": "Inclure périphérique ESP",
         "Mode inclusion": "Mode inclusion",
         "Rechercher": "Search",
@@ -68,7 +68,7 @@
         "Unité": "Unité",
         "Paramètres": "Paramètres"
     },
-    "plugins\/espeasy\/desktop\/js\/espeasy.js": {
+    "plugins\/espeasy_tcalmant\/desktop\/js\/espeasy_tcalmant.js": {
         "Santé espeasy": "Santé espeasy",
         "Interface espeasy": "Interface espeasy",
         "Arrêter l\\'inclusion": "Arrêter l\\'inclusion",
@@ -82,7 +82,7 @@
         "Afficher": "Afficher",
         "Tester": "Tester"
     },
-    "plugins\/espeasy\/desktop\/modal\/health.php": {
+    "plugins\/espeasy_tcalmant\/desktop\/modal\/health.php": {
         "Module": "Module",
         "ID": "ID",
         "Device": "Device",

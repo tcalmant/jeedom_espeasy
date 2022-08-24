@@ -17,7 +17,7 @@
  */
 require_once dirname(__FILE__) . "/../../../../core/php/core.inc.php";
 
-if (!jeedom::apiAccess(init('apikey'), 'espeasy-tcalmant')) {
+if (!jeedom::apiAccess(init('apikey'), 'espeasy_tcalmant')) {
 	echo __('Clef API non valide, vous n\'êtes pas autorisé à effectuer cette action (espeasy)', __FILE__);
 	die();
 }
@@ -41,24 +41,24 @@ if(empty($espUnitIp)) {
 	$ip = $espUnitIp;
 }
 
-$elogic = espeasy::byLogicalId($logicalId, 'espeasy-tcalmant');
+$elogic = espeasy_tcalmant::byLogicalId($logicalId, 'espeasy_tcalmant');
 if (!is_object($elogic)) {
 	// Unknown ESP
-	if (config::byKey('include_mode','espeasy-tcalmant') != 1) {
+	if (config::byKey('include_mode','espeasy_tcalmant') != 1) {
 		// Not in inclusion mode: reject the new equipment
 		return false;
 	}
 
 	// Store the new ESP
-	$elogic = new espeasy();
-	$elogic->setEqType_name('espeasy-tcalmant');
+	$elogic = new espeasy_tcalmant();
+	$elogic->setEqType_name('espeasy_tcalmant');
 	$elogic->setLogicalId($logicalId);
 	$elogic->setName($espUnitName);
 	$elogic->setIsEnable(true);
 	$elogic->setConfiguration('ip', $ip);
 	$elogic->setConfiguration('device', $logicalId);
 	$elogic->save();
-	event::add('espeasy::includeDevice', array('state' => 1));
+	event::add('espeasy_tcalmant::includeDevice', array('state' => 1));
 } else {
 	// Update IP if it changed
 	if ($ip != $elogic->getConfiguration('ip')) {
@@ -72,10 +72,10 @@ if (!is_object($elogic)) {
 $cmdId = $taskid . "-" . $valueName;
 
 // Look for the associated ESP task
-$cmdlogic = espeasyCmd::byEqLogicIdAndLogicalId($elogic->getId(), $cmdId);
+$cmdlogic = espeasy_tcalmantCmd::byEqLogicIdAndLogicalId($elogic->getId(), $cmdId);
 if (!is_object($cmdlogic)) {
 	// Task is known
-	$cmdlogic = new espeasyCmd();
+	$cmdlogic = new espeasy_tcalmantCmd();
 	$cmdlogic->setLogicalId($cmdId);
 	$cmdlogic->setName($valueName);
 	$cmdlogic->setType('info');

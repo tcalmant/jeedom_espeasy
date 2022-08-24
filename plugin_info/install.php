@@ -18,8 +18,8 @@
 
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
-function espeasy_update() {
-    espeasy::deamon_stop();
+function espeasy_tcalmant_update() {
+    espeasy_tcalmant::deamon_stop();
     $sensor_path = dirname(__FILE__) . '/../resources';
     exec('cd ' . $sensor_path . '; rm -rf node_modules');
 }
