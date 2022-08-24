@@ -1,0 +1,9 @@
+# Python
+*.pyc
+*.pyo
+__pycache__/
+
+# Binaries
+*.zip
+*.gz
+*.tgz
