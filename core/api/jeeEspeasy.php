@@ -22,6 +22,7 @@ if (!jeedom::apiAccess(init('apikey'), 'espeasy-tcalmant')) {
 	die();
 }
 
+// Read parameters from the URL query string
 $espUnitId = init('unitId');
 $espUnitName = init('name');
 $espClientIp = init('ip');
@@ -42,9 +43,13 @@ if(empty($espUnitIp)) {
 
 $elogic = espeasy::byLogicalId($logicalId, 'espeasy-tcalmant');
 if (!is_object($elogic)) {
+	// Unknown ESP
 	if (config::byKey('include_mode','espeasy-tcalmant') != 1) {
+		// Not in inclusion mode: reject the new equipment
 		return false;
 	}
+
+	// Store the new ESP
 	$elogic = new espeasy();
 	$elogic->setEqType_name('espeasy-tcalmant');
 	$elogic->setLogicalId($logicalId);
@@ -53,28 +58,31 @@ if (!is_object($elogic)) {
 	$elogic->setConfiguration('ip', $ip);
 	$elogic->setConfiguration('device', $logicalId);
 	$elogic->save();
-	event::add('espeasy::includeDevice',
-	array(
-		'state' => 1
-	)
-);
+	event::add('espeasy::includeDevice', array('state' => 1));
 } else {
-	if ($device != $elogic->getConfiguration('device')) {
-		$elogic->setConfiguration('device', $logicalId);
+	// Update IP if it changed
+	if ($ip != $elogic->getConfiguration('ip')) {
+		$elogic->setConfiguration('ip', $ip);
 		$elogic->save();
 	}
 }
 
-$cmdlogic = espeasyCmd::byEqLogicIdAndLogicalId($elogic->getId(), $valueName);
+// Make sure we manage correctly different values with the same name
+// but from different tasks
+$cmdId = $taskid . "-" . $valueName;
+
+// Look for the associated ESP task
+$cmdlogic = espeasyCmd::byEqLogicIdAndLogicalId($elogic->getId(), $cmdId);
 if (!is_object($cmdlogic)) {
+	// Task is known
 	$cmdlogic = new espeasyCmd();
-	$cmdlogic->setLogicalId($valueName);
+	$cmdlogic->setLogicalId($cmdId);
 	$cmdlogic->setName($valueName);
 	$cmdlogic->setType('info');
 	$cmdlogic->setSubType('numeric');
 	$cmdlogic->setEqLogic_id($elogic->getId());
-	$cmdlogic->setConfiguration('taskid',$taskid);
-	$cmdlogic->setConfiguration('cmd',$valueName);
+	$cmdlogic->setConfiguration('taskid', $taskid);
+	$cmdlogic->setConfiguration('cmd', $valueName);
 }
 $cmdlogic->setConfiguration('value',$value);
 $cmdlogic->event($value);
