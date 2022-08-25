@@ -7,6 +7,7 @@ import argparse
 import html
 import logging
 import sys
+import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Dict, List, Optional
@@ -31,6 +32,18 @@ class DaemonRequestHandler(BaseHTTPRequestHandler):
             # Ignore favicon query
             self.send_response(404)
             self.end_headers()
+            return
+        elif split.path == "/check":
+            # Daemon status check
+            self.send_response(200)
+            self.end_headers()
+            return
+        elif split.path == "/stop":
+            # Stop the daemon
+            logging.warning("Stopping daemon on request")
+            self.send_response(200)
+            self.end_headers()
+            self.server.shutdown()
             return
 
         content = {k: v[0] for k, v in parse_qs(split.query).items()}
@@ -69,19 +82,23 @@ class DaemonRequestHandler(BaseHTTPRequestHandler):
 
         # Send the query
         req = urllib.request.Request(jeedom_url, method="PUT")
-        with urllib.request.urlopen(req) as response:
-            raw_response = response.read()
-
-            if response.status == 200:
-                logging.debug("Data sent successfully")
-            else:
-                message = (
-                    "Error sending data to Jeedom. "
-                    f"Code={response.status}, Reason={response.reason}"
-                )
-                logging.error(message)
-                logging.info("Error content:\n%s", raw_response)
-                raise IOError(message)
+        try:
+            with urllib.request.urlopen(req) as response:
+                raw_response = response.read()
+                if response.status == 200:
+                    logging.debug("Data sent successfully")
+                else:
+                    logging.warning(
+                        "Got status=%d (%s) from Jeedom",
+                        response.status,
+                        response.reason,
+                    )
+        except urllib.error.HTTPError as ex:
+            message = (
+                f"Error sending data to Jeedom. Code={ex.status}, Reason={ex.reason}"
+            )
+            logging.error(message)
+            raise IOError(message)
 
     def respond_to_esp(self, success: bool, reason: Optional[str] = None) -> None:
         """
@@ -120,6 +137,7 @@ class DaemonRequestHandler(BaseHTTPRequestHandler):
     def log_request(self, *args, **kwargs) -> None:
         # Ignore successful requests logging
         return None
+
 
 def run_daemon(server_host: str, server_port: int, jeedom_url: str) -> int:
     """
