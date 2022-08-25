@@ -53,6 +53,7 @@ $('.changeIncludeState').on('click', function () {
         $('.changeIncludeState.card span center').text('{{Arrêter l\'inclusion}}');
         $('.changeIncludeState:not(.card)').html('<i class="fas fa-sign-in fa-rotate-90"></i> {{Arreter inclusion}}');
         $('#div_inclusionAlert').showAlert({message: '{{Vous etes en mode inclusion. Recliquez sur le bouton d\'inclusion pour sortir de ce mode}}', level: 'warning'});
+        $('#inclusion_icon').attr("class", "fas fa-stop-circle");
       } else {
         $.hideAlert();
         $('.changeIncludeState:not(.card)').addClass('btn-default').removeClass('btn-success btn-danger');
@@ -61,6 +62,7 @@ $('.changeIncludeState').on('click', function () {
         $('.changeIncludeState.card span center').text('{{Mode inclusion}}');
         $('.changeIncludeState.card').css('background-color','#ffffff');
         $('#div_inclusionAlert').hideAlert();
+        $('#inclusion_icon').attr("class", "fas fa-plus-circle");
       }
     }
   });

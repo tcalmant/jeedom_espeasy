@@ -40,7 +40,7 @@ if ($state == 1) {
       }
       ?>
 
-          <i class="fas fa-plus-circle"></i>
+          <i id="inclusion_icon" class="fas fa-plus-circle"></i>
           <br/>
         <span>{{Inclusion}}</span>
       </div>
