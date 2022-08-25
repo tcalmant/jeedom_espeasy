@@ -35,12 +35,14 @@ if ($state == 1) {
       <?php
       if ($state == 1) {
         echo '<div class="cursor logoSecondary changeIncludeState card" data-state="0">';
+        $initialIcon = "fa-stop-circle";
       } else {
         echo '<div class="cursor logoSecondary changeIncludeState card" data-state="1">';
+        $initialIcon = "fa-plus-circle";
       }
       ?>
 
-          <i id="inclusion_icon" class="fas fa-plus-circle"></i>
+          <i id="inclusion_icon" class="fas <?php echo $initialIcon; ?>"></i>
           <br/>
         <span>{{Inclusion}}</span>
       </div>
