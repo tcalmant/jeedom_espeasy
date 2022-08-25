@@ -31,8 +31,16 @@ $taskid = init('task');
 $valueName = init('valueName');
 $value = init('value');
 
+/**
+ * Ensures that the logical IDs we generate are SQL valid
+ */
+function escapeId($eid) {
+	return str_replace("_", "-", $eid);
+}
+
 // Generate a logical ID based on the Unit name and its ID
-$logicalId = $espUnitName . "-" . $espUnitId;
+$logicalId = escapeId($espUnitName . "-" . $espUnitId);
+log::add('espeasy_tcalmant', 'info', 'Using logical ID: ' . $logicalId);
 
 // Make sure we have a valid IP address
 if(empty($espUnitIp)) {
@@ -42,6 +50,7 @@ if(empty($espUnitIp)) {
 }
 
 $elogic = espeasy_tcalmant::byLogicalId($logicalId, 'espeasy_tcalmant');
+log::add('espeasy_tcalmant', 'info', 'Got object: ' . $elogic);
 if (!is_object($elogic)) {
 	// Unknown ESP
 	if (config::byKey('include_mode','espeasy_tcalmant') != 1) {
@@ -53,23 +62,27 @@ if (!is_object($elogic)) {
 	$elogic = new espeasy_tcalmant();
 	$elogic->setEqType_name('espeasy_tcalmant');
 	$elogic->setLogicalId($logicalId);
-	$elogic->setName($espUnitName);
+	$elogic->setName(escapeId($espUnitName) . " (" . $espUnitId . ")");
 	$elogic->setIsEnable(true);
 	$elogic->setConfiguration('ip', $ip);
 	$elogic->setConfiguration('device', $logicalId);
-	$elogic->save();
+	$res = $elogic->save();
+	log::add('espeasy_tcalmant', 'info', 'New device stored: ' . $logicalId);
 	event::add('espeasy_tcalmant::includeDevice', array('state' => 1));
 } else {
 	// Update IP if it changed
+	log::add('espeasy_tcalmant', 'info', 'Known device: ' . $logicalId);
+
 	if ($ip != $elogic->getConfiguration('ip')) {
 		$elogic->setConfiguration('ip', $ip);
 		$elogic->save();
+		log::add('espeasy_tcalmant', 'info', 'Updated IP of ' . $logicalId . ' to ' . $ip);
 	}
 }
 
 // Make sure we manage correctly different values with the same name
 // but from different tasks
-$cmdId = $taskid . "-" . $valueName;
+$cmdId = escapeId($taskid . "-" . $valueName);
 
 // Look for the associated ESP task
 $cmdlogic = espeasy_tcalmantCmd::byEqLogicIdAndLogicalId($elogic->getId(), $cmdId);
