@@ -68,6 +68,7 @@ class espeasyTCalmant extends eqLogic {
     $cmd = $cmd . ' --jeedom ' . $url;
     $cmd = $cmd . ' --address ' . config::byKey('espeasyIpAddr', 'espeasyTCalmant', config::byKey('internalAddr'));
     $cmd = $cmd . ' --port ' . config::byKey('espeasyIpPort', 'espeasyTCalmant', 8121);
+    $cmd = $cmd . ' --log-js ' . $log;
 
     log::add('espeasyTCalmant', 'debug', 'Lancement démon espeasyTCalmant : ' . $cmd);
 

@@ -4,13 +4,14 @@ ESP Easy daemon
 """
 
 import argparse
+from cmath import log
 import html
 import logging
 import sys
 import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, cast
 from urllib.parse import SplitResult, parse_qs, urlencode, urlsplit, urlunsplit
 
 
@@ -170,9 +171,11 @@ def main(args: Optional[List[str]] = None) -> int:
     log_levels = list(logging._levelToName.values())
 
     parser = argparse.ArgumentParser()
-    parser.add_argument(
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
         "-l", "--level", choices=log_levels, default="INFO", help="Log level"
     )
+    group.add_argument("--log-js", help="JavaScript log level (integer)")
     group = parser.add_argument_group("Daemon server")
     group.add_argument("-a", "--address", default="0.0.0.0", help="Binding address")
     group.add_argument("-p", "--port", type=int, default=8121, help="Binding port")
@@ -180,9 +183,29 @@ def main(args: Optional[List[str]] = None) -> int:
     group.add_argument("--jeedom", required=True, help="URL to Jeedom API")
     options = parser.parse_args(args)
 
+    # Use the default Python log level
+    log_level = logging.getLevelName(options.level)
+
+    if options.log_js and options.log_js != "default":
+        try:
+            log_js = int(options.log_js)
+            if log_js >= 1000:
+                log_level = logging.CRITICAL
+            elif log_js >= 400:
+                log_level = logging.ERROR
+            elif log_js >= 300:
+                log_level = logging.WARNING
+            elif log_js >= 200:
+                log_level = logging.INFO
+            else:
+                log_level = logging.DEBUG
+        except (ValueError, TypeError):
+            print("Invalid log level:", options.log_js, file=sys.stderr)
+    else:
+        log_level = logging.getLevelName(options.level)
+
     logging.basicConfig(
-        level=logging.getLevelName(options.level),
-        format="%(asctime)s :: %(levelname)s :: %(message)s",
+        level=log_level, format="%(asctime)s :: %(levelname)s :: %(message)s",
     )
 
     return run_daemon(options.address, options.port, options.jeedom)
