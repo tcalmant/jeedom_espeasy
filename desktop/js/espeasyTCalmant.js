@@ -27,19 +27,19 @@ $("#bt_addespeasyAction").on('click', function(event) {
 
 $('#bt_healthespeasy').on('click', function () {
   $('#md_modal').dialog({title: "{{Santé espeasy}}"});
-  $('#md_modal').load('index.php?v=d&plugin=espeasy_tcalmant&modal=health').dialog('open');
+  $('#md_modal').load('index.php?v=d&plugin=espeasyTCalmant&modal=health').dialog('open');
 });
 
 $('#bt_webespeasy').on('click', function () {
   var nodeId = $('#idespeasy').value();
   $('#md_modal').dialog({title: "{{Interface espeasy}}"});
-  $('#md_modal').load('index.php?v=d&plugin=espeasy_tcalmant&modal=web&ip=' + nodeId).dialog('open');
+  $('#md_modal').load('index.php?v=d&plugin=espeasyTCalmant&modal=web&ip=' + nodeId).dialog('open');
 });
 
 $('.changeIncludeState').on('click', function () {
   var el = $(this);
   jeedom.config.save({
-    plugin : 'espeasy_tcalmant',
+    plugin : 'espeasyTCalmant',
     configuration: {include_mode: el.attr('data-state')},
     error: function (error) {
       $('#div_alert').showAlert({message: error.message, level: 'danger'});
@@ -73,7 +73,7 @@ $('body').on('espeasy::includeDevice', function (_event,_options) {
     if (_options == '') {
       window.location.reload();
     } else {
-      window.location.href = 'index.php?v=d&p=espeasy_tcalmant&m=espeasy_tcalmant&id=' + _options;
+      window.location.href = 'index.php?v=d&p=espeasyTCalmant&m=espeasyTCalmant&id=' + _options;
     }
   }
 });

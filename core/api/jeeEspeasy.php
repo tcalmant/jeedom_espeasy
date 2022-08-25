@@ -17,7 +17,7 @@
  */
 require_once dirname(__FILE__) . "/../../../../core/php/core.inc.php";
 
-if (!jeedom::apiAccess(init('apikey'), 'espeasy_tcalmant')) {
+if (!jeedom::apiAccess(init('apikey'), 'espeasyTCalmant')) {
 	echo __('Clef API non valide, vous n\'êtes pas autorisé à effectuer cette action (espeasy)', __FILE__);
 	die();
 }
@@ -40,7 +40,7 @@ function escapeId($eid) {
 
 // Generate a logical ID based on the Unit name and its ID
 $logicalId = escapeId($espUnitName . "-" . $espUnitId);
-log::add('espeasy_tcalmant', 'info', 'Using logical ID: ' . $logicalId);
+log::add('espeasyTCalmant', 'debug', 'Using logical ID: ' . $logicalId);
 
 // Make sure we have a valid IP address
 if(empty($espUnitIp)) {
@@ -49,34 +49,33 @@ if(empty($espUnitIp)) {
 	$ip = $espUnitIp;
 }
 
-$elogic = espeasy_tcalmant::byLogicalId($logicalId, 'espeasy_tcalmant');
-log::add('espeasy_tcalmant', 'info', 'Got object: ' . $elogic);
+$elogic = espeasyTCalmant::byLogicalId($logicalId, 'espeasyTCalmant');
 if (!is_object($elogic)) {
 	// Unknown ESP
-	if (config::byKey('include_mode','espeasy_tcalmant') != 1) {
+	if (config::byKey('include_mode','espeasyTCalmant') != 1) {
 		// Not in inclusion mode: reject the new equipment
 		return false;
 	}
 
 	// Store the new ESP
-	$elogic = new espeasy_tcalmant();
-	$elogic->setEqType_name('espeasy_tcalmant');
+	$elogic = new espeasyTCalmant();
+	$elogic->setEqType_name('espeasyTCalmant');
 	$elogic->setLogicalId($logicalId);
 	$elogic->setName(escapeId($espUnitName) . " (" . $espUnitId . ")");
 	$elogic->setIsEnable(true);
 	$elogic->setConfiguration('ip', $ip);
 	$elogic->setConfiguration('device', $logicalId);
 	$res = $elogic->save();
-	log::add('espeasy_tcalmant', 'info', 'New device stored: ' . $logicalId);
-	event::add('espeasy_tcalmant::includeDevice', array('state' => 1));
+	log::add('espeasyTCalmant', 'info', 'New device stored: ' . $logicalId);
+	event::add('espeasyTCalmant::includeDevice', array('state' => 1));
 } else {
 	// Update IP if it changed
-	log::add('espeasy_tcalmant', 'info', 'Known device: ' . $logicalId);
+	log::add('espeasyTCalmant', 'debug', 'Known device: ' . $logicalId);
 
 	if ($ip != $elogic->getConfiguration('ip')) {
 		$elogic->setConfiguration('ip', $ip);
 		$elogic->save();
-		log::add('espeasy_tcalmant', 'info', 'Updated IP of ' . $logicalId . ' to ' . $ip);
+		log::add('espeasyTCalmant', 'info', 'Updated IP of ' . $logicalId . ' to ' . $ip);
 	}
 }
 
@@ -85,19 +84,20 @@ if (!is_object($elogic)) {
 $cmdId = escapeId($taskid . "-" . $valueName);
 
 // Look for the associated ESP task
-$cmdlogic = espeasy_tcalmantCmd::byEqLogicIdAndLogicalId($elogic->getId(), $cmdId);
+$cmdlogic = espeasyTCalmantCmd::byEqLogicIdAndLogicalId($elogic->getId(), $cmdId);
 if (!is_object($cmdlogic)) {
 	// Task is known
-	$cmdlogic = new espeasy_tcalmantCmd();
+	log::add('espeasyTCalmant', 'info', 'Registering new command ' . $cmdId);
+	$cmdlogic = new espeasyTCalmantCmd();
 	$cmdlogic->setLogicalId($cmdId);
-	$cmdlogic->setName($valueName);
+	$cmdlogic->setName(escapeId($valueName));
 	$cmdlogic->setType('info');
 	$cmdlogic->setSubType('numeric');
 	$cmdlogic->setEqLogic_id($elogic->getId());
 	$cmdlogic->setConfiguration('taskid', $taskid);
 	$cmdlogic->setConfiguration('cmd', $valueName);
 }
-$cmdlogic->setConfiguration('value',$value);
+$cmdlogic->setConfiguration('value', $value);
 $cmdlogic->event($value);
 $cmdlogic->save();
 

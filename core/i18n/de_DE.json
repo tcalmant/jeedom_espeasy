@@ -1,10 +1,10 @@
 {
-    "plugins\/espeasy_tcalmant\/plugin_info\/configuration.php": {
+    "plugins\/espeasyTCalmant\/plugin_info\/configuration.php": {
         "IP Controleur à saisir dans ESPeasy (onglet config)": "Controller-IP in ESPeasy (Registerkarte \"Config\") eingeben",
         "Port Controleur à saisir dans ESPeasy (onglet config)": "Controller-Port in ESPeasy (Registerkarte \"Config\") eingeben",
         "Publish template à saisir dans ESPeasy (onglet tools, puis bouton advanced)": "Vorlage Veröffentlichen,  in ESPeasy (Registerkarte Werkzeuge und dann Schaltfläche Erweitert) eingeben"
     },
-    "plugins\/espeasy_tcalmant\/desktop\/php\/espeasy.php": {
+    "plugins\/espeasyTCalmant\/desktop\/php\/espeasy.php": {
         "Inclure périphérique ESP": "ESP-Gerät inkludieren",
         "Mode inclusion": "Inklusions Modus",
         "Rechercher": "Suchen",
@@ -68,7 +68,7 @@
         "Unité": "Einheit",
         "Paramètres": "Parameter"
     },
-    "plugins\/espeasy_tcalmant\/desktop\/js\/espeasy_tcalmant.js": {
+    "plugins\/espeasyTCalmant\/desktop\/js\/espeasyTCalmant.js": {
         "Santé espeasy": "ESPeasy Gesundheit",
         "Interface espeasy": "ESPeasy Interface",
         "Arrêter l\\'inclusion": "Inklusion stoppen",
@@ -82,7 +82,7 @@
         "Afficher": "Anzeigen",
         "Tester": "Testen"
     },
-    "plugins\/espeasy_tcalmant\/desktop\/modal\/health.php": {
+    "plugins\/espeasyTCalmant\/desktop\/modal\/health.php": {
         "Module": "Modul",
         "ID": "ID",
         "Device": "Device",

@@ -20,7 +20,7 @@
 require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 
 
-class espeasy_tcalmant extends eqLogic {
+class espeasyTCalmant extends eqLogic {
 
   /**
    * Sends a command to an ESP Easy
@@ -38,7 +38,7 @@ class espeasy_tcalmant extends eqLogic {
    */
   public static function deamon_info() {
     $return = array();
-    $return['log'] = 'espeasy_tcalmant_daemon';
+    $return['log'] = 'espeasyTCalmant_daemon';
     $return['state'] = 'nok';
     $pid = trim( shell_exec ('ps ax | grep "espeasy_daemon.py" | grep -v "grep" | wc -l') );
     if ($pid != '' && $pid != '0') {
@@ -57,20 +57,20 @@ class espeasy_tcalmant extends eqLogic {
     if ($deamon_info['launchable'] != 'ok') {
       throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
     }
-    log::add('espeasy_tcalmant', 'info', 'Lancement du démon espeasy_tcalmant');
+    log::add('espeasyTCalmant', 'info', 'Lancement du démon espeasyTCalmant');
 
-    $url = network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/espeasy_tcalmant/core/api/jeeEspeasy.php?apikey=' . jeedom::getApiKey('espeasy_tcalmant');
+    $url = network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/espeasyTCalmant/core/api/jeeEspeasy.php?apikey=' . jeedom::getApiKey('espeasyTCalmant');
 
-    $log = log::getLogLevel('espeasy_tcalmant');
+    $log = log::getLogLevel('espeasyTCalmant');
     $sensor_path = realpath(dirname(__FILE__) . '/../../resources');
 
     $cmd = 'nice -n 19 python3 ' . $sensor_path . '/espeasy_daemon.py --jeedom ' . $url;
 
-    log::add('espeasy_tcalmant', 'debug', 'Lancement démon espeasy_tcalmant : ' . $cmd);
+    log::add('espeasyTCalmant', 'debug', 'Lancement démon espeasyTCalmant : ' . $cmd);
 
-    $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('espeasy_tcalmant_daemon') . ' 2>&1 &');
+    $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('espeasyTCalmant_daemon') . ' 2>&1 &');
     if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false) {
-      log::add('espeasy_tcalmant', 'error', $result);
+      log::add('espeasyTCalmant', 'error', $result);
       return false;
     }
 
@@ -84,11 +84,11 @@ class espeasy_tcalmant extends eqLogic {
       $i++;
     }
     if ($i >= 30) {
-      log::add('espeasy_tcalmant', 'error', 'Impossible de lancer le démon espeasy_tcalmant, vérifiez le port', 'unableStartDeamon');
+      log::add('espeasyTCalmant', 'error', 'Impossible de lancer le démon espeasyTCalmant, vérifiez le port', 'unableStartDeamon');
       return false;
     }
-    message::removeAll('espeasy_tcalmant', 'unableStartDeamon');
-    log::add('espeasy_tcalmant', 'info', 'Démon espeasy_tcalmant lancé');
+    message::removeAll('espeasyTCalmant', 'unableStartDeamon');
+    log::add('espeasyTCalmant', 'info', 'Démon espeasyTCalmant lancé');
     return true;
   }
 
@@ -97,7 +97,7 @@ class espeasy_tcalmant extends eqLogic {
    */
   public static function deamon_stop() {
     exec('kill $(ps aux | grep "/espeasy_daemon.py" | awk \'{print $2}\')');
-    log::add('espeasy_tcalmant', 'info', 'Arrêt du service espeasy_tcalmant');
+    log::add('espeasyTCalmant', 'info', 'Arrêt du service espeasyTCalmant');
     $deamon_info = self::deamon_info();
     if ($deamon_info['state'] == 'ok') {
       sleep(1);
@@ -121,7 +121,7 @@ class espeasy_tcalmant extends eqLogic {
   }
 }
 
-class espeasy_tcalmantCmd extends cmd {
+class espeasyTCalmantCmd extends cmd {
   public function execute($_options = null) {
     switch ($this->getType()) {
       case 'info' :
@@ -153,7 +153,7 @@ class espeasy_tcalmantCmd extends cmd {
 
       $eqLogic = $this->getEqLogic();
 
-      espeasy_tcalmant::sendCommand(
+      espeasyTCalmant::sendCommand(
       $eqLogic->getConfiguration('ip') ,
       $request );
 
@@ -165,7 +165,7 @@ class espeasy_tcalmantCmd extends cmd {
   public function preSave() {
     if ($this->getType() == "action") {
       $eqLogic = $this->getEqLogic();
-      log::add('espeasy_tcalmant','info','http://' . $eqLogic->getConfiguration('ip') . '/control?cmd=' . $this->getConfiguration('request'));
+      log::add('espeasyTCalmant','info','http://' . $eqLogic->getConfiguration('ip') . '/control?cmd=' . $this->getConfiguration('request'));
       $this->setConfiguration('value', 'http://' . $eqLogic->getConfiguration('ip') . '/control?cmd=' . $this->getConfiguration('request'));
       //$this->save();
     }

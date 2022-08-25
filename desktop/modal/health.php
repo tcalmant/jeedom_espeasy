@@ -18,7 +18,7 @@
 if (!isConnect('admin')) {
 	throw new Exception('401 Unauthorized');
 }
-$eqLogics = espeasy_tcalmant::byType('espeasy_tcalmant');
+$eqLogics = espeasyTCalmant::byType('espeasyTCalmant');
 ?>
 
 <table class="table table-condensed tablesorter" id="table_healthespeasy">

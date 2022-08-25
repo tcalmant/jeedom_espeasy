@@ -3,9 +3,9 @@
 if (!isConnect('admin')) {
   throw new Exception('{{401 - Accès non autorisé}}');
 }
-sendVarToJS('eqType', 'espeasy_tcalmant');
-$eqLogics = eqLogic::byType('espeasy_tcalmant');
-$state = config::byKey('include_mode', 'espeasy_tcalmant');
+sendVarToJS('eqType', 'espeasyTCalmant');
+$eqLogics = eqLogic::byType('espeasyTCalmant');
+$state = config::byKey('include_mode', 'espeasyTCalmant');
 echo '<div id="div_inclusionAlert"></div>';
 if ($state == 1) {
   echo '<div class="alert jqAlert alert-warning" id="div_inclusionAlert" style="margin : 0px 5px 15px 15px; padding : 7px 35px 7px 15px;">{{Vous êtes en mode inclusion. Cliquez à nouveau sur le bouton d\'inclusion pour sortir de ce mode}}</div>';
@@ -66,7 +66,7 @@ if ($state == 1) {
         $opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
         echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="background-color : #ffffff ; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;' . $opacity . '" >';
         echo "<center>";
-        echo '<img src="plugins/espeasy_tcalmant/plugin_info/espeasy_tcalmant_icon.png" height="105" width="95" />';
+        echo '<img src="plugins/espeasyTCalmant/plugin_info/espeasyTCalmant_icon.png" height="105" width="95" />';
         echo "</center>";
         echo '<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;"><center>' . $eqLogic->getHumanName(true, true) . '</center></span>';
         echo '</div>';
@@ -253,12 +253,12 @@ if ($state == 1) {
 </div>
 </div>
 
-<?php include_file('desktop', 'espeasy_tcalmant', 'js', 'espeasy_tcalmant'); ?>
+<?php include_file('desktop', 'espeasyTCalmant', 'js', 'espeasyTCalmant'); ?>
 <?php include_file('core', 'plugin.template', 'js'); ?>
 
 <script>
 $( "#sel_icon" ).change(function(){
-  var text = 'plugins/espeasy_tcalmant/plugin_info/node_' + $("#sel_icon").val() + '.png';
+  var text = 'plugins/espeasyTCalmant/plugin_info/node_' + $("#sel_icon").val() + '.png';
   //$("#icon_visu").attr('src',text);
   document.icon_visu.src=text;
 });
