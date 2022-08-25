@@ -115,10 +115,6 @@ class espeasyTCalmant extends eqLogic {
       throw new Exception(__('L\'adresse ne peut etre vide',__FILE__));
     }
   }
-
-  public function preSave() {
-    $this->setLogicalId($this->getConfiguration('ip'));
-  }
 }
 
 class espeasyTCalmantCmd extends cmd {
