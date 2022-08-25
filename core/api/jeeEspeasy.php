@@ -31,15 +31,8 @@ $taskid = init('task');
 $valueName = init('valueName');
 $value = init('value');
 
-/**
- * Ensures that the logical IDs we generate are SQL valid
- */
-function escapeId($eid) {
-	return str_replace("_", "-", $eid);
-}
-
 // Generate a logical ID based on the Unit name and its ID
-$logicalId = escapeId($espUnitName . "-" . $espUnitId);
+$logicalId = $espUnitName . "-" . $espUnitId;
 log::add('espeasyTCalmant', 'debug', 'Using logical ID: ' . $logicalId);
 
 // Make sure we have a valid IP address
@@ -61,7 +54,7 @@ if (!is_object($elogic)) {
 	$elogic = new espeasyTCalmant();
 	$elogic->setEqType_name('espeasyTCalmant');
 	$elogic->setLogicalId($logicalId);
-	$elogic->setName(escapeId($espUnitName) . " (" . $espUnitId . ")");
+	$elogic->setName($espUnitName . " (" . $espUnitId . ")");
 	$elogic->setIsEnable(true);
 	$elogic->setConfiguration('ip', $ip);
 	$elogic->setConfiguration('device', $logicalId);
@@ -81,7 +74,7 @@ if (!is_object($elogic)) {
 
 // Make sure we manage correctly different values with the same name
 // but from different tasks
-$cmdId = escapeId($taskid . "-" . $valueName);
+$cmdId = $taskid . "-" . $valueName;
 
 // Look for the associated ESP task
 $cmdlogic = espeasyTCalmantCmd::byEqLogicIdAndLogicalId($elogic->getId(), $cmdId);
@@ -90,7 +83,7 @@ if (!is_object($cmdlogic)) {
 	log::add('espeasyTCalmant', 'info', 'Registering new command ' . $cmdId);
 	$cmdlogic = new espeasyTCalmantCmd();
 	$cmdlogic->setLogicalId($cmdId);
-	$cmdlogic->setName(escapeId($valueName));
+	$cmdlogic->setName($valueName);
 	$cmdlogic->setType('info');
 	$cmdlogic->setSubType('numeric');
 	$cmdlogic->setEqLogic_id($elogic->getId());
