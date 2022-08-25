@@ -66,7 +66,8 @@ class espeasyTCalmant extends eqLogic {
 
     $cmd = 'nice -n 19 python3 ' . $sensor_path . '/espeasy_daemon.py';
     $cmd = $cmd . ' --jeedom ' . $url;
-    $cmd = $cmd . ' --address ' . config::byKey('espeasyIpAddr', 'espeasyTCalmant');
+    $cmd = $cmd . ' --address ' . config::byKey('espeasyIpAddr', 'espeasyTCalmant', config::byKey('internalAddr'));
+    $cmd = $cmd . ' --port ' . config::byKey('espeasyIpPort', 'espeasyTCalmant', 8121);
 
     log::add('espeasyTCalmant', 'debug', 'Lancement démon espeasyTCalmant : ' . $cmd);
 

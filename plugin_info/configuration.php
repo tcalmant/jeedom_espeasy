@@ -87,9 +87,12 @@ if (!isConnect()) {
       </div>
 
       <div class="form-group">
-        <label class="col-lg-4 control-label">{{Port Controleur à saisir dans ESPeasy (onglet config)}} :</label>
+        <label for="binding-port" class="col-lg-4 control-label">{{Port Controleur à saisir dans ESPeasy (onglet config)}} :</label>
         <div class="col-lg-4">
-          8121
+          <?php
+            $portConfig = config::byKey('espeasyIpPort', 'espeasyTCalmant', 8121);
+            echo '<input id="binding-port" class="configKey form-control" data-l1key="espeasyIpPort" type="number" min="1" max="65535" step="1" value="' . $portConfig . '">';
+          ?>
         </div>
       </div>
 
