@@ -32,8 +32,7 @@ $('#bt_healthespeasy').on('click', function () {
 
 $('#bt_webespeasy').on('click', function () {
   var nodeId = $('#idespeasy').value();
-  $('#md_modal').dialog({title: "{{Interface espeasy}}"});
-  $('#md_modal').load('index.php?v=d&plugin=espeasyTCalmant&modal=web&ip=' + nodeId).dialog('open');
+  window.open("http://" + nodeId + "/", '_blank');
 });
 
 $('.changeIncludeState').on('click', function () {
