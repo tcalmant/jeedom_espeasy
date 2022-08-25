@@ -30,18 +30,59 @@ if (!isConnect()) {
     <fieldset>
 
       <div class="form-group">
-        <label class="col-lg-4 control-label">{{IP Controleur à saisir dans ESPeasy (onglet config)}} :</label>
+        <label for="ip-addresses" class="col-lg-4 control-label">{{IP Controleur à saisir dans ESPeasy (onglet config)}} :</label>
         <div class="col-lg-4">
-          <select class="configKey form-control" data-l1key="espeasyIpAddr">
-            <?php
-              $ip_shell = shell_exec("ip addr | awk '/inet / {gsub(/\/.*/,\"\",$2); print $2}'");
-              $ip_array = preg_split('/\s+/', trim($ip_shell));
-              foreach($ip_array as $ip)
-              {
-                      echo "<option value='".$ip."'>".$ip."</option>";
+          <input id="ip-addresses" class="configKey form-control" type="text" list="ipaddresses" data-l1key="espeasyIpAddr" />
+          <datalist id="ipaddresses">
+          <?php
+            // Flag indicating if the current IP configuration is in our list
+            $foundCurrentIp = false;
+
+            // Jeedom default IP
+            $ip_jeedom = config::byKey('internalAddr');
+
+            // Current IP
+            $currentIpConfig = config::byKey('espeasyIpAddr', 'espeasyTCalmant');
+            if(empty($currentIpConfig)) {
+              $currentIpConfig = $ip_jeedom;
+              $foundCurrentIp = true;
+            }
+
+            // Bind to all interfaces
+            $foundCurrentIp |= $currentIpConfig == "0.0.0.0";
+            $selectedFlag = ($currentIpConfig == "0.0.0.0") ? "selected" : "";
+            echo '<option value="0.0.0.0" ' . $selectedFlag . '>' . __("{{Toutes interfaces}}", __FILE__) . '</option>';
+
+            // Bind to the Jeedom configured address (default)
+            $foundCurrentIp |= $currentIpConfig == $ip_jeedom;
+            $selectedFlag = ($currentIpConfig == $ip_jeedom) ? "selected" : "";
+            echo '<option value="' . $ip_jeedom . '" ' . $selectedFlag . '>' . __("{{IP Jeedom}}", __FILE__) . '</option>';
+
+            // List all (other) available system addresses
+            $ip_shell = shell_exec("ip addr | awk '/inet / {gsub(/\/.*/,\"\",$2); print $2}'");
+            $ip_array = preg_split('/\s+/', trim($ip_shell));
+
+            foreach($ip_array as $ip)
+            {
+              if(empty($ip) || $ip == $ip_jeedom) {
+                // Ignore empty IP / already marked IPs
+                continue;
               }
-            ?>
-          </select>
+
+              if($ip == $currentIpConfig) {
+                $selectedFlag = "selected";
+                $foundCurrentIp = true;
+              } else {
+                $selectedFlag = "";
+              }
+              echo '<option value="' . $ip . '" ' . $selectedFlag . '></option>';
+            }
+
+            if(!$foundCurrentIp) {
+              echo '<option value="' . $currentIpConfig . '" selected>' . __("{{IP personnalisée}}", __FILE__) . '</option>';
+            }
+          ?>
+          </datalist>
         </div>
       </div>
 
